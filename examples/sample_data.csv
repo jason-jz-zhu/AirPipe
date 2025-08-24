@@ -1,0 +1,26 @@
+id,name,department,salary,age,position
+1,John Smith,Engineering,95000,32,Senior Engineer
+2,Jane Doe,Sales,78000,28,Sales Manager
+3,Bob Johnson,Engineering,120000,45,Tech Lead
+4,Alice Williams,HR,65000,30,HR Specialist
+5,Charlie Brown,Sales,55000,26,Sales Rep
+6,Diana Prince,Engineering,110000,38,Principal Engineer
+7,Eve Anderson,Finance,72000,31,Financial Analyst
+8,Frank Miller,Sales,82000,35,Senior Sales Rep
+9,Grace Lee,Engineering,88000,29,Software Engineer
+10,Henry Wilson,HR,70000,33,HR Manager
+11,Iris Chen,Engineering,105000,36,Staff Engineer
+12,Jack Taylor,Sales,92000,40,Sales Director
+13,Karen White,Finance,68000,27,Junior Analyst
+14,Larry Davis,Engineering,75000,25,Junior Engineer
+15,Mary Johnson,HR,58000,29,HR Assistant
+16,Nathan Brown,Sales,71000,32,Sales Rep
+17,Olivia Garcia,Engineering,98000,34,Senior Engineer
+18,Paul Martinez,Finance,85000,37,Senior Analyst
+19,Quinn Robinson,Engineering,115000,42,Engineering Manager
+20,Rachel Green,Sales,64000,28,Sales Rep
+21,Steve Rogers,Engineering,102000,35,Senior Engineer
+22,Tina Turner,HR,76000,39,Senior HR Specialist
+23,Uma Thurman,Finance,90000,41,Finance Manager
+24,Victor Stone,Sales,69000,30,Sales Rep
+25,Wendy Davis,Engineering,93000,33,Software Engineer
