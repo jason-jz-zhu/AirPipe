@@ -107,7 +107,7 @@ dmypy.json
 *~
 
 # AirPipe specific
-artifacts/
+# artifacts/
 output/
 logs/
 *.db
