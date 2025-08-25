@@ -1,24 +1,29 @@
 #!/usr/bin/env python3
 """
 Example streaming workflow demonstrating micro-batch processing.
-Shows how to run existing pipelines on continuous data streams.
+Shows how to run existing pipelines on continuous data streams using
+proper pipeline components (extractors, transformers, loaders).
 """
 
 import pandas as pd
 import logging
-import time
 from datetime import datetime
 from airpipe.core.task import TaskPipeline
 from airpipe.core.streaming import (
     MicroBatchProcessor,
     StreamConfig,
-    StreamingSource,
     StreamMonitor,
     AlertRule,
     StateManager,
-    SimulatedDataSource,
-    create_source
+    WindowedAggregator
 )
+
+# Import streaming pipeline components
+from pipelines.streaming.extractors.batch_extractor import StreamingBatchExtractor
+from pipelines.streaming.transformers.batch_processor import StreamingBatchProcessor
+from pipelines.streaming.transformers.alert_processor import StreamingAlertProcessor
+from pipelines.streaming.loaders.metrics_loader import StreamingMetricsLoader
+from pipelines.streaming.loaders.alert_loader import StreamingAlertLoader
 
 # Configure logging
 logging.basicConfig(
@@ -34,26 +39,27 @@ pipeline = TaskPipeline("streaming_analytics")
 # State manager for maintaining aggregations
 state_manager = StateManager(backend="memory")
 
+# Initialize pipeline components
+batch_extractor = StreamingBatchExtractor()
+batch_processor = StreamingBatchProcessor(state_manager)
+alert_processor = StreamingAlertProcessor()
+metrics_loader = StreamingMetricsLoader(state_manager)
+alert_loader = StreamingAlertLoader()
+
 
 @pipeline.task(produces="processed_batch")
 def process_batch():
-    """Process incoming stream batch."""
-    # Get the batch injected by streaming processor
-    batch_artifact = pipeline.get_artifact("stream_batch")
-    df = batch_artifact.as_dataframe()
+    """Process incoming stream batch using batch processor."""
+    # Extract batch data
+    df = batch_extractor.extract_stream_batch(pipeline, "stream_batch")
     
-    logger.info(f"Processing batch with {len(df)} records")
+    # Apply anomaly detection
+    df_with_anomalies = batch_processor.detect_anomalies(df, method='iqr', threshold=1.5)
     
-    # Add processing timestamp
-    df['processed_at'] = datetime.now()
+    # Process the batch (add timestamps, etc.)
+    processed_df = batch_processor.process_batch_data(df_with_anomalies)
     
-    # Detect anomalies
-    if '_is_anomaly' in df.columns:
-        anomaly_count = df['_is_anomaly'].sum()
-        if anomaly_count > 0:
-            logger.warning(f"Found {anomaly_count} anomalies in batch")
-    
-    return pipeline.create_artifact(df, "processed_batch")
+    return pipeline.create_artifact(processed_df, "processed_batch")
 
 
 @pipeline.task(
@@ -62,38 +68,12 @@ def process_batch():
     produces="aggregated_metrics"
 )
 def aggregate_metrics():
-    """Aggregate metrics from processed batch."""
+    """Aggregate metrics from processed batch using batch processor."""
     batch = pipeline.get_artifact("processed_batch")
     df = batch.as_dataframe()
     
-    # Calculate batch metrics
-    metrics = {
-        'record_count': len(df),
-        'timestamp': datetime.now().isoformat()
-    }
-    
-    # Aggregate numeric columns
-    numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
-    for col in numeric_cols:
-        if col not in ['_id', '_is_anomaly']:
-            metrics[f'{col}_mean'] = df[col].mean()
-            metrics[f'{col}_std'] = df[col].std()
-            metrics[f'{col}_min'] = df[col].min()
-            metrics[f'{col}_max'] = df[col].max()
-    
-    # Update running statistics in state
-    total_records = state_manager.get_state('total_records', 0)
-    total_records += len(df)
-    state_manager.update_state('total_records', total_records)
-    
-    # Track anomalies
-    if '_is_anomaly' in df.columns:
-        total_anomalies = state_manager.get_state('total_anomalies', 0)
-        total_anomalies += df['_is_anomaly'].sum()
-        state_manager.update_state('total_anomalies', total_anomalies)
-        metrics['anomaly_rate'] = (total_anomalies / total_records) * 100
-    
-    metrics['total_records_processed'] = total_records
+    # Use batch processor to aggregate metrics
+    metrics = batch_processor.aggregate_batch_metrics(df)
     
     return pipeline.create_artifact(metrics, "aggregated_metrics")
 
@@ -104,77 +84,87 @@ def aggregate_metrics():
     produces="alerts"
 )
 def check_alerts():
-    """Check for alert conditions."""
+    """Check for alert conditions using alert processor."""
     metrics = pipeline.get_artifact("aggregated_metrics")
     data = metrics.data
     
-    alerts = []
+    # Setup alert rules
+    alert_processor.add_alert_rule(
+        rule_name="high_anomaly_rate",
+        metric_name="anomaly_rate",
+        condition=">",
+        threshold=5.0,
+        severity="WARNING",
+        message_template="Anomaly rate {value:.2f}% exceeds threshold (5.0%)"
+    )
     
-    # Check anomaly rate
-    if 'anomaly_rate' in data and data['anomaly_rate'] > 5.0:
-        alerts.append({
-            'type': 'HIGH_ANOMALY_RATE',
-            'message': f"Anomaly rate {data['anomaly_rate']:.2f}% exceeds threshold",
-            'severity': 'WARNING',
-            'timestamp': datetime.now().isoformat()
+    alert_processor.add_alert_rule(
+        rule_name="low_throughput",
+        metric_name="record_count",
+        condition="<",
+        threshold=50,
+        severity="ERROR",
+        message_template="Low batch size detected: {value} records"
+    )
+    
+    # Process all alert types
+    alerts = alert_processor.process_all_alerts(data)
+    
+    # Convert to list of dictionaries
+    alert_dicts = []
+    for alert in alerts:
+        alert_dicts.append({
+            'type': alert.alert_type,
+            'message': alert.message,
+            'severity': alert.severity,
+            'timestamp': alert.timestamp,
+            'value': alert.value,
+            'threshold': alert.threshold,
+            'metric_name': alert.metric_name
         })
     
-    # Check for extreme values
-    for key, value in data.items():
-        if '_max' in key and value > 500:
-            alerts.append({
-                'type': 'EXTREME_VALUE',
-                'message': f"{key} = {value:.2f} exceeds threshold",
-                'severity': 'INFO',
-                'timestamp': datetime.now().isoformat()
-            })
-    
-    if alerts:
-        logger.warning(f"Generated {len(alerts)} alerts")
-        for alert in alerts:
-            logger.warning(f"[{alert['severity']}] {alert['message']}")
-    
-    return pipeline.create_artifact(alerts, "alerts")
+    return pipeline.create_artifact(alert_dicts, "alerts")
 
 
 @pipeline.task(
-    depends_on=["aggregate_metrics"],
-    consumes="aggregated_metrics"
+    depends_on=["aggregate_metrics", "check_alerts"],
+    consumes=["aggregated_metrics", "alerts"]
 )
-def save_metrics():
-    """Save metrics to file (simulating data sink)."""
+def save_metrics_and_alerts():
+    """Save metrics and alerts using loaders."""
+    # Get artifacts
     metrics = pipeline.get_artifact("aggregated_metrics")
+    alerts = pipeline.get_artifact("alerts")
     
-    # In real scenario, this would write to database, S3, etc.
-    # For demo, just log the metrics
-    logger.info(f"Metrics: {metrics.data}")
+    # Save metrics using metrics loader
+    metrics_loader.save_streaming_metrics(metrics.data)
     
-    # Periodically save checkpoint
-    batch_count = state_manager.get_state('batch_count', 0) + 1
-    state_manager.update_state('batch_count', batch_count)
-    
-    if batch_count % 10 == 0:
-        checkpoint_id = state_manager.checkpoint()
-        logger.info(f"Created checkpoint: {checkpoint_id}")
+    # Save alerts using alert loader
+    if alerts.data:
+        alert_loader.save_alerts(alerts.data)
+        
+        # Process alert notifications
+        notification_stats = alert_loader.process_alert_notifications(
+            alerts.data,
+            {
+                'methods': ['log'],
+                'severity_thresholds': {
+                    'INFO': ['log'],
+                    'WARNING': ['log'],
+                    'ERROR': ['log'],
+                    'CRITICAL': ['log']
+                }
+            }
+        )
+        logger.info(f"Processed notifications: {notification_stats}")
 
 
 def run_streaming():
     """Run the streaming pipeline."""
     
-    # Create simulated data source
+    # Create simulated data source using batch extractor
     # In production, this could be Kafka, API, Database, etc.
-    source = SimulatedDataSource(
-        schema={
-            'temperature': 'float',
-            'pressure': 'float',
-            'humidity': 'float',
-            'sensor_id': 'string',
-            'location': 'string'
-        },
-        rate=100.0,  # 100 records per second
-        noise=0.2,
-        anomaly_rate=0.02  # 2% anomalies
-    )
+    source = batch_extractor.create_sensor_data_source()
     
     # Configure streaming
     config = StreamConfig(
@@ -231,7 +221,7 @@ def run_streaming():
             process_batch()
             aggregate_metrics()
             check_alerts()
-            save_metrics()
+            save_metrics_and_alerts()
             
             # Return pipeline execution results
             return pipeline.execute(parallel=False)
@@ -253,36 +243,23 @@ def run_streaming():
         # Stop monitoring
         monitor.stop()
         
-        # Print final statistics
-        print("\n" + "=" * 60)
-        print("STREAMING PIPELINE COMPLETE")
-        print("=" * 60)
-        
-        # Get final metrics
+        # Print final statistics using metrics loader
         final_metrics = monitor.get_metrics_summary()
-        print(f"Total Records: {state_manager.get_state('total_records', 0):,}")
-        print(f"Total Anomalies: {state_manager.get_state('total_anomalies', 0):,}")
-        print(f"Total Batches: {state_manager.get_state('batch_count', 0)}")
+        metrics_loader.print_streaming_summary(final_metrics)
         
-        if 'cumulative' in final_metrics:
-            print("\nPerformance Metrics:")
-            for metric, stats in final_metrics['cumulative'].items():
-                if 'throughput' in metric:
-                    print(f"  {metric}: {stats['avg']:.2f} records/sec")
-                elif 'batch_time' in metric:
-                    print(f"  {metric}: {stats['avg']:.3f} seconds")
-        
-        # Show alert summary
-        if monitor.alerts:
-            print(f"\nAlerts Generated: {len(monitor.alerts)}")
-            severity_counts = {}
-            for alert in monitor.alerts:
-                severity = alert.severity
-                severity_counts[severity] = severity_counts.get(severity, 0) + 1
-            for severity, count in severity_counts.items():
+        # Show alert summary from alert loader
+        alert_stats = alert_loader.get_alert_statistics()
+        if alert_stats['total_alerts'] > 0:
+            print(f"\nAlert Statistics:")
+            print(f"  Total Alerts: {alert_stats['total_alerts']}")
+            for severity, count in alert_stats['by_severity'].items():
                 print(f"  {severity}: {count}")
+            if alert_stats['latest_alert_time']:
+                print(f"  Latest Alert: {alert_stats['latest_alert_time']}")
         
-        print("=" * 60)
+        # Export final reports
+        alert_loader.export_alert_history(hours=24, format='json')
+        print(f"\nReports saved to: {metrics_loader.output_dir}")
 
 
 def run_streaming_with_window():
@@ -292,35 +269,26 @@ def run_streaming_with_window():
     # Create pipeline for windowed processing
     window_pipeline = TaskPipeline("windowed_streaming")
     
-    @window_pipeline.task(produces="windowed_stats")
+    # Create window-specific batch processor
+    window_batch_processor = StreamingBatchProcessor()
+    
+    @window_pipeline.task(produces="windowed_stats") 
     def compute_window_stats():
-        """Compute statistics for time window."""
+        """Compute statistics for time window using batch processor."""
         batch = window_pipeline.get_artifact("stream_batch")
         df = batch.as_dataframe()
         
-        stats = {
-            'window_start': df['_timestamp'].min(),
-            'window_end': df['_timestamp'].max(),
-            'record_count': len(df),
-            'anomaly_count': df['_is_anomaly'].sum() if '_is_anomaly' in df.columns else 0
-        }
-        
-        # Calculate aggregates
-        numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
-        for col in numeric_cols:
-            if col not in ['_id', '_is_anomaly']:
-                stats[f'{col}_avg'] = df[col].mean()
-                stats[f'{col}_p95'] = df[col].quantile(0.95)
-        
-        logger.info(f"Window stats: {stats['record_count']} records, "
-                   f"{stats.get('anomaly_count', 0)} anomalies")
+        # Use batch processor for windowed statistics
+        stats = window_batch_processor.compute_windowed_statistics(df, window_seconds=30.0)
         
         return window_pipeline.create_artifact(stats, "windowed_stats")
     
-    # Create source
-    source = SimulatedDataSource(
+    # Create source using batch extractor
+    window_extractor = StreamingBatchExtractor()
+    source = window_extractor.create_simulated_source(
         schema={'value': 'float', 'category': 'string'},
-        rate=50.0
+        rate=50.0,
+        anomaly_rate=0.01
     )
     
     # Configure with larger batches for windowing

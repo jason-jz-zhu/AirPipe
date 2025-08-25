@@ -1,0 +1,1 @@
+"""DuckDB extractors for data generation and retrieval."""

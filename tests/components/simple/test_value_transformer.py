@@ -4,7 +4,7 @@ import unittest
 import pandas as pd
 import numpy as np
 
-from pipelines.examples.simple.transformers.value_transformer import ValueTransformer
+from pipelines.simple.transformers.value_transformer import ValueTransformer
 from tests.base import BaseTestCase
 
 
