@@ -53,9 +53,9 @@ class DuckDBSession:
         'read_only': False,
         'config': {
             'memory_limit': '2GB',
-            'threads': -1,  # Use all available threads
+            'threads': 4,  # Use 4 threads (safe default)
             'default_order': 'ASC',
-            'enable_profiling': False,
+            # Removed enable_profiling - causes issues with boolean value
             'enable_progress_bar': False,
             'max_expression_depth': 1000
         }
@@ -114,12 +114,24 @@ class DuckDBSession:
                     read_only=final_config['read_only']
                 )
                 
-                # Apply configuration
+                # Apply configuration with better type handling
                 for key, value in final_config['config'].items():
                     try:
+                        # Skip problematic boolean configs
+                        if isinstance(value, bool):
+                            if key == 'enable_progress_bar' and not value:
+                                continue  # Skip if False
+                            continue
+                        
+                        # Handle threads specifically
+                        if key == 'threads' and value < 1:
+                            value = 4  # Default to 4 threads if invalid
+                        
+                        # Apply the configuration
                         conn.execute(f"SET {key} = '{value}'")
                     except Exception as e:
-                        LOG.warning(f"Could not set {key} = {value}: {e}")
+                        # Only warn for errors, don't fail
+                        LOG.debug(f"Skipped config {key} = {value}: {e}")
                 
                 cls._connections[database] = conn
                 
