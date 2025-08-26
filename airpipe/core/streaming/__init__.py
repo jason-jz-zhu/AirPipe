@@ -7,7 +7,8 @@ from .micro_batch import (
     StreamConfig,
     StreamingSource,
     WindowedAggregator,
-    StreamingStats
+    StreamingStats,
+    TumblingWindow
 )
 from .state import StateManager, StreamingContext
 from .monitor import StreamMonitor, AlertRule, HealthChecker
@@ -36,5 +37,6 @@ __all__ = [
     'create_source',
     'SparkMicroBatchProcessor',
     'SparkStreamConfig',
-    'create_spark_file_stream'
+    'create_spark_file_stream',
+    'TumblingWindow'
 ]
