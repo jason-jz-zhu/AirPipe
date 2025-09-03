@@ -48,12 +48,13 @@ class TaskPipeline:
     rather than using configuration objects.
     """
     
-    def __init__(self, name: str = "task_pipeline"):
+    def __init__(self, name: str = "task_pipeline", lineage_tracker=None):
         """
         Initialize task pipeline.
         
         Args:
             name: Pipeline name
+            lineage_tracker: Optional SplineLineageTracker instance for lineage tracking
         """
         self.name = name
         self.tasks: Dict[str, Task] = {}
@@ -61,6 +62,7 @@ class TaskPipeline:
         self.named_artifacts: Dict[str, DataArtifact] = {}  # Store artifacts by custom names
         self.logger = logging.getLogger(f"TaskPipeline.{name}")
         self._execution_order: List[str] = []
+        self.lineage_tracker = lineage_tracker
         
         # Initialize visualizers
         self._visualizers = {
@@ -167,6 +169,19 @@ class TaskPipeline:
         """Execute a single task."""
         self.logger.info(f"Executing task: {task.name}")
         
+        # Track task start with lineage tracker
+        if self.lineage_tracker:
+            input_artifacts = []
+            if task.consumes:
+                input_artifacts = task.consumes if isinstance(task.consumes, list) else [task.consumes]
+            
+            self.lineage_tracker.track_task_start(
+                task_name=task.name,
+                task_type=task.task_type.value if task.task_type else 'unknown',
+                dependencies=task.dependencies or [],
+                metadata={'produces': task.produces, 'consumes': task.consumes}
+            )
+        
         try:
             # Check if function expects no arguments (uses get_artifact internally)
             import inspect
@@ -199,10 +214,37 @@ class TaskPipeline:
                 else:
                     self.logger.info(f"Task {task.name} produced artifact: {result.name}")
             
+            # Track task completion with lineage tracker
+            if self.lineage_tracker:
+                input_artifacts = []
+                if task.consumes:
+                    input_artifacts = task.consumes if isinstance(task.consumes, list) else [task.consumes]
+                
+                output_artifact = None
+                if isinstance(result, DataArtifact):
+                    output_artifact = task.produces or result.name
+                
+                self.lineage_tracker.track_task_complete(
+                    task_name=task.name,
+                    result=result,
+                    input_artifacts=input_artifacts,
+                    output_artifact=output_artifact
+                )
+            
             return result
             
         except Exception as e:
             self.logger.error(f"Task {task.name} failed: {str(e)}")
+            
+            # Track task failure with lineage tracker
+            if self.lineage_tracker:
+                self.lineage_tracker.track_task_complete(
+                    task_name=task.name,
+                    result=None,
+                    input_artifacts=[],
+                    output_artifact=None
+                )
+            
             raise
     
     def create_artifact(self, data: Any, name: str) -> DataArtifact:
@@ -219,6 +261,16 @@ class TaskPipeline:
         artifact = DataArtifact(data=data, name=name)
         # Store in named artifacts for easy retrieval
         self.set_artifact(name, artifact)
+        
+        # Track artifact creation with lineage tracker
+        if self.lineage_tracker:
+            metadata = {
+                'format': str(artifact.metadata.format.value) if artifact.metadata else 'unknown',
+                'row_count': artifact.metadata.row_count if artifact.metadata else None,
+                'column_count': artifact.metadata.column_count if artifact.metadata else None
+            }
+            self.lineage_tracker.track_artifact_created(name, data, metadata)
+        
         return artifact
     
     def get_artifact(self, name: str) -> DataArtifact:
@@ -265,26 +317,50 @@ class TaskPipeline:
         """
         self.logger.info(f"Executing pipeline: {self.name}")
         
-        # Build execution order based on dependencies
-        execution_order = self._build_execution_order()
+        # Start lineage tracking
+        if self.lineage_tracker:
+            pipeline_metadata = {
+                'total_tasks': len(self.tasks),
+                'parallel_execution': parallel,
+                'max_workers': max_workers
+            }
+            self.lineage_tracker.start_pipeline(self.name, pipeline_metadata)
         
-        # Execute tasks
-        if parallel:
-            self._execute_parallel(execution_order, max_workers)
-        else:
-            self._execute_sequential(execution_order)
-        
-        # Return results
-        results = {
-            "pipeline": self.name,
-            "tasks_executed": len(execution_order),
-            "artifacts_created": len(self.artifacts),
-            "artifacts": list(self.artifacts.keys())
-        }
-        
-        self.logger.info(f"Pipeline complete: {results['tasks_executed']} tasks executed")
-        
-        return results
+        try:
+            # Build execution order based on dependencies
+            execution_order = self._build_execution_order()
+            
+            # Execute tasks
+            if parallel:
+                self._execute_parallel(execution_order, max_workers)
+            else:
+                self._execute_sequential(execution_order)
+            
+            # Return results
+            results = {
+                "pipeline": self.name,
+                "tasks_executed": len(execution_order),
+                "artifacts_created": len(self.artifacts),
+                "artifacts": list(self.artifacts.keys()),
+                "status": "completed"
+            }
+            
+            self.logger.info(f"Pipeline complete: {results['tasks_executed']} tasks executed")
+            
+            # End lineage tracking on success
+            if self.lineage_tracker:
+                self.lineage_tracker.end_pipeline(success=True)
+            
+            return results
+            
+        except Exception as e:
+            self.logger.error(f"Pipeline execution failed: {str(e)}")
+            
+            # End lineage tracking on failure
+            if self.lineage_tracker:
+                self.lineage_tracker.end_pipeline(success=False, error=str(e))
+            
+            raise
     
     def _build_execution_order(self) -> List[List[str]]:
         """

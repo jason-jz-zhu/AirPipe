@@ -6,6 +6,10 @@ tabulate>=0.8.9
 duckdb>=0.9.0
 pyspark>=3.4.0  # For distributed processing with Apache Spark
 
+# Lineage tracking dependencies (optional)
+# Note: Apache Spline server must be running separately
+# requests is already included above for Spline HTTP API
+
 # Testing dependencies
 pytest>=7.0.0
 pytest-cov>=4.0.0
