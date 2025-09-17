@@ -1,0 +1,7 @@
+Dataset Size,Single Task,10 Parallel,100 Parallel,Streaming Mode
+1MB,0.0s / 335MB,0.0s / 568MB,0.0s / 568MB,0.0s / 506MB
+10MB,0.0s / 339MB,0.0s / 568MB,0.0s / 568MB,0.0s / 494MB
+100MB,0.0s / 559MB,0.0s / 563MB,0.0s / 533MB,0.0s / 480MB
+1GB,N/A,N/A,N/A,N/A
+5GB,N/A,N/A,N/A,N/A
+10GB,N/A,N/A,N/A,N/A
