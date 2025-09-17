@@ -1,0 +1,232 @@
+[
+  {
+    "test_name": "single_task_etl",
+    "dataset_size": "1MB",
+    "execution_mode": "single",
+    "start_time": 1758101527.88858,
+    "timestamp": "2025-09-17T05:32:07.888580",
+    "end_time": 1758101528.094948,
+    "duration": 0.20636796951293945,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 107.328125,
+        "mean_mb": 99.390625,
+        "min_mb": 91.453125,
+        "final_mb": 107.328125
+      },
+      "cpu": {
+        "peak_percent": 52.6,
+        "mean_percent": 26.3,
+        "total_cpu_seconds": 0.05260000000000001
+      },
+      "duration_seconds": 0.10568404197692871
+    },
+    "success": false,
+    "data_size_bytes": 654185,
+    "error": "'TaskPipeline' object has no attribute 'artifact_store'",
+    "throughput_mbps": 3.023140820499786
+  },
+  {
+    "test_name": "single_task_etl",
+    "dataset_size": "10MB",
+    "execution_mode": "single",
+    "start_time": 1758101528.095254,
+    "timestamp": "2025-09-17T05:32:08.095256",
+    "end_time": 1758101528.418852,
+    "duration": 0.32359814643859863,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 181.875,
+        "mean_mb": 152.04166666666666,
+        "min_mb": 109.75,
+        "final_mb": 181.875
+      },
+      "cpu": {
+        "peak_percent": 97.6,
+        "mean_percent": 63.1,
+        "total_cpu_seconds": 0.18930000000000002
+      },
+      "duration_seconds": 0.22137784957885742
+    },
+    "success": false,
+    "data_size_bytes": 6561300,
+    "error": "'TaskPipeline' object has no attribute 'artifact_store'",
+    "throughput_mbps": 19.336771119063354
+  },
+  {
+    "test_name": "parallel_10",
+    "dataset_size": "1MB",
+    "execution_mode": "10_parallel",
+    "start_time": 1758101528.419101,
+    "timestamp": "2025-09-17T05:32:08.419103",
+    "end_time": 1758101528.522495,
+    "duration": 0.1033940315246582,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 184.234375,
+        "mean_mb": 184.234375,
+        "min_mb": 184.234375,
+        "final_mb": 184.234375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00012803077697753906
+    },
+    "success": false,
+    "parallel_count": 10,
+    "data_size_bytes": 654185,
+    "error": "Cannot resolve dependencies for tasks: {'merge_results', 'final_output'}",
+    "throughput_mbps": 6.0339985149861874
+  },
+  {
+    "test_name": "parallel_100",
+    "dataset_size": "1MB",
+    "execution_mode": "100_parallel",
+    "start_time": 1758101528.5227652,
+    "timestamp": "2025-09-17T05:32:08.522767",
+    "end_time": 1758101528.627421,
+    "duration": 0.10465574264526367,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 184.234375,
+        "mean_mb": 184.234375,
+        "min_mb": 184.234375,
+        "final_mb": 184.234375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.0001277923583984375
+    },
+    "success": false,
+    "parallel_count": 100,
+    "data_size_bytes": 654185,
+    "error": "Cannot resolve dependencies for tasks: {'merge_results', 'final_output'}",
+    "throughput_mbps": 5.9612536962534
+  },
+  {
+    "test_name": "parallel_10",
+    "dataset_size": "10MB",
+    "execution_mode": "10_parallel",
+    "start_time": 1758101528.629075,
+    "timestamp": "2025-09-17T05:32:08.629078",
+    "end_time": 1758101528.732966,
+    "duration": 0.10389089584350586,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 184.234375,
+        "mean_mb": 184.234375,
+        "min_mb": 184.234375,
+        "final_mb": 184.234375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.0002951622009277344
+    },
+    "success": false,
+    "parallel_count": 10,
+    "data_size_bytes": 6561300,
+    "error": "Cannot resolve dependencies for tasks: {'merge_results', 'final_output'}",
+    "throughput_mbps": 60.22994836488812
+  },
+  {
+    "test_name": "parallel_100",
+    "dataset_size": "10MB",
+    "execution_mode": "100_parallel",
+    "start_time": 1758101528.7336068,
+    "timestamp": "2025-09-17T05:32:08.733611",
+    "end_time": 1758101528.839125,
+    "duration": 0.10551810264587402,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 184.234375,
+        "mean_mb": 184.234375,
+        "min_mb": 184.234375,
+        "final_mb": 184.234375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.0003159046173095703
+    },
+    "success": false,
+    "parallel_count": 100,
+    "data_size_bytes": 6561300,
+    "error": "Cannot resolve dependencies for tasks: {'merge_results', 'final_output'}",
+    "throughput_mbps": 59.30113540077953
+  },
+  {
+    "test_name": "streaming",
+    "dataset_size": "1MB",
+    "execution_mode": "streaming",
+    "start_time": 1758101528.8400588,
+    "timestamp": "2025-09-17T05:32:08.840063",
+    "end_time": 1758101528.945246,
+    "duration": 0.10518717765808105,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 184.234375,
+        "mean_mb": 184.234375,
+        "min_mb": 184.234375,
+        "final_mb": 184.234375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.0003972053527832031
+    },
+    "success": true,
+    "data_size_bytes": 654185,
+    "duration_seconds": 0.0113677978515625,
+    "batches_processed": 0,
+    "records_processed": 0,
+    "throughput_records_per_second": 0.0,
+    "avg_batch_time": 0,
+    "pipeline_type": "streaming_etl",
+    "throughput_mbps": 5.931135776892791
+  },
+  {
+    "test_name": "streaming",
+    "dataset_size": "10MB",
+    "execution_mode": "streaming",
+    "start_time": 1758101528.945556,
+    "timestamp": "2025-09-17T05:32:08.945558",
+    "end_time": 1758101529.046826,
+    "duration": 0.10126996040344238,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 183.28125,
+        "mean_mb": 183.28125,
+        "min_mb": 183.28125,
+        "final_mb": 183.28125
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00013375282287597656
+    },
+    "success": true,
+    "data_size_bytes": 6561300,
+    "duration_seconds": 0.057832956314086914,
+    "batches_processed": 0,
+    "records_processed": 0,
+    "throughput_records_per_second": 0.0,
+    "avg_batch_time": 0,
+    "pipeline_type": "streaming_etl",
+    "throughput_mbps": 61.78874038567934
+  }
+]

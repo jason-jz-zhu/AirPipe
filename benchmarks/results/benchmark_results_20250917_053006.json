@@ -1,0 +1,332 @@
+[
+  {
+    "test_name": "single_task_etl",
+    "dataset_size": "1MB",
+    "execution_mode": "single",
+    "start_time": 1758101409.676699,
+    "timestamp": "2025-09-17T05:30:09.676700",
+    "end_time": 1758101409.781923,
+    "duration": 0.1052241325378418,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 334.703125,
+        "mean_mb": 334.703125,
+        "min_mb": 334.703125,
+        "final_mb": 334.703125
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.0001671314239501953
+    },
+    "success": false,
+    "data_size_bytes": 654185,
+    "error": "Not allowed to merge between different levels. (1 levels on the left, 2 on the right)",
+    "throughput_mbps": 5.929052752740505
+  },
+  {
+    "test_name": "single_task_etl",
+    "dataset_size": "10MB",
+    "execution_mode": "single",
+    "start_time": 1758101409.782252,
+    "timestamp": "2025-09-17T05:30:09.782254",
+    "end_time": 1758101409.8850718,
+    "duration": 0.10281968116760254,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 338.8125,
+        "mean_mb": 338.8125,
+        "min_mb": 338.8125,
+        "final_mb": 338.8125
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00013208389282226562
+    },
+    "success": false,
+    "data_size_bytes": 6561300,
+    "error": "Not allowed to merge between different levels. (1 levels on the left, 2 on the right)",
+    "throughput_mbps": 60.857446951585715
+  },
+  {
+    "test_name": "single_task_etl",
+    "dataset_size": "100MB",
+    "execution_mode": "single",
+    "start_time": 1758101409.8852968,
+    "timestamp": "2025-09-17T05:30:09.885299",
+    "end_time": 1758101410.7471092,
+    "duration": 0.8618123531341553,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 558.640625,
+        "mean_mb": 433.16964285714283,
+        "min_mb": 362.796875,
+        "final_mb": 558.640625
+      },
+      "cpu": {
+        "peak_percent": 99.9,
+        "mean_percent": 84.64285714285714,
+        "total_cpu_seconds": 0.5925
+      },
+      "duration_seconds": 0.7607388496398926
+    },
+    "success": false,
+    "data_size_bytes": 65787633,
+    "error": "Not allowed to merge between different levels. (1 levels on the left, 2 on the right)",
+    "throughput_mbps": 72.80004249311769
+  },
+  {
+    "test_name": "parallel_10",
+    "dataset_size": "1MB",
+    "execution_mode": "10_parallel",
+    "start_time": 1758101410.747415,
+    "timestamp": "2025-09-17T05:30:10.747420",
+    "end_time": 1758101410.852591,
+    "duration": 0.10517597198486328,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 567.59375,
+        "mean_mb": 567.59375,
+        "min_mb": 567.59375,
+        "final_mb": 567.59375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00013899803161621094
+    },
+    "success": false,
+    "parallel_count": 10,
+    "data_size_bytes": 654185,
+    "error": "task() got an unexpected keyword argument 'name'",
+    "throughput_mbps": 5.931767692795938
+  },
+  {
+    "test_name": "parallel_100",
+    "dataset_size": "1MB",
+    "execution_mode": "100_parallel",
+    "start_time": 1758101410.8527749,
+    "timestamp": "2025-09-17T05:30:10.852777",
+    "end_time": 1758101410.957951,
+    "duration": 0.10517621040344238,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 567.59375,
+        "mean_mb": 567.59375,
+        "min_mb": 567.59375,
+        "final_mb": 567.59375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00010991096496582031
+    },
+    "success": false,
+    "parallel_count": 100,
+    "data_size_bytes": 654185,
+    "error": "task() got an unexpected keyword argument 'name'",
+    "throughput_mbps": 5.931754246374742
+  },
+  {
+    "test_name": "parallel_10",
+    "dataset_size": "10MB",
+    "execution_mode": "10_parallel",
+    "start_time": 1758101410.958221,
+    "timestamp": "2025-09-17T05:30:10.958222",
+    "end_time": 1758101411.062894,
+    "duration": 0.10467314720153809,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 567.59375,
+        "mean_mb": 567.59375,
+        "min_mb": 567.59375,
+        "final_mb": 567.59375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00011515617370605469
+    },
+    "success": false,
+    "parallel_count": 10,
+    "data_size_bytes": 6561300,
+    "error": "task() got an unexpected keyword argument 'name'",
+    "throughput_mbps": 59.77983331473176
+  },
+  {
+    "test_name": "parallel_100",
+    "dataset_size": "10MB",
+    "execution_mode": "100_parallel",
+    "start_time": 1758101411.063468,
+    "timestamp": "2025-09-17T05:30:11.063470",
+    "end_time": 1758101411.1686358,
+    "duration": 0.10516786575317383,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 567.59375,
+        "mean_mb": 567.59375,
+        "min_mb": 567.59375,
+        "final_mb": 567.59375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.0003349781036376953
+    },
+    "success": false,
+    "parallel_count": 100,
+    "data_size_bytes": 6561300,
+    "error": "task() got an unexpected keyword argument 'name'",
+    "throughput_mbps": 59.49862391352645
+  },
+  {
+    "test_name": "parallel_10",
+    "dataset_size": "100MB",
+    "execution_mode": "10_parallel",
+    "start_time": 1758101411.1689012,
+    "timestamp": "2025-09-17T05:30:11.168902",
+    "end_time": 1758101411.274074,
+    "duration": 0.10517287254333496,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 563.21875,
+        "mean_mb": 563.21875,
+        "min_mb": 563.21875,
+        "final_mb": 563.21875
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00011086463928222656
+    },
+    "success": false,
+    "parallel_count": 10,
+    "data_size_bytes": 65787633,
+    "error": "task() got an unexpected keyword argument 'name'",
+    "throughput_mbps": 596.541431379172
+  },
+  {
+    "test_name": "parallel_100",
+    "dataset_size": "100MB",
+    "execution_mode": "100_parallel",
+    "start_time": 1758101411.274337,
+    "timestamp": "2025-09-17T05:30:11.274339",
+    "end_time": 1758101411.3746839,
+    "duration": 0.10034680366516113,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 532.9375,
+        "mean_mb": 532.9375,
+        "min_mb": 532.9375,
+        "final_mb": 532.9375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00011801719665527344
+    },
+    "success": false,
+    "parallel_count": 100,
+    "data_size_bytes": 65787633,
+    "error": "task() got an unexpected keyword argument 'name'",
+    "throughput_mbps": 625.2314337645676
+  },
+  {
+    "test_name": "streaming",
+    "dataset_size": "1MB",
+    "execution_mode": "streaming",
+    "start_time": 1758101411.374924,
+    "timestamp": "2025-09-17T05:30:11.374926",
+    "end_time": 1758101411.476755,
+    "duration": 0.10183095932006836,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 505.890625,
+        "mean_mb": 505.890625,
+        "min_mb": 505.890625,
+        "final_mb": 505.890625
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 9.608268737792969e-05
+    },
+    "success": false,
+    "data_size_bytes": 654185,
+    "error": "__init__() got an unexpected keyword argument 'batch_timeout_seconds'",
+    "throughput_mbps": 6.12661843553183
+  },
+  {
+    "test_name": "streaming",
+    "dataset_size": "10MB",
+    "execution_mode": "streaming",
+    "start_time": 1758101411.4770079,
+    "timestamp": "2025-09-17T05:30:11.477009",
+    "end_time": 1758101411.582256,
+    "duration": 0.10524821281433105,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 494.46875,
+        "mean_mb": 494.46875,
+        "min_mb": 494.46875,
+        "final_mb": 494.46875
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00010085105895996094
+    },
+    "success": false,
+    "data_size_bytes": 6561300,
+    "error": "__init__() got an unexpected keyword argument 'batch_timeout_seconds'",
+    "throughput_mbps": 59.453202338693785
+  },
+  {
+    "test_name": "streaming",
+    "dataset_size": "100MB",
+    "execution_mode": "streaming",
+    "start_time": 1758101411.582763,
+    "timestamp": "2025-09-17T05:30:11.582765",
+    "end_time": 1758101411.684481,
+    "duration": 0.10171794891357422,
+    "resource_metrics": {
+      "memory": {
+        "peak_mb": 480.234375,
+        "mean_mb": 480.234375,
+        "min_mb": 480.234375,
+        "final_mb": 480.234375
+      },
+      "cpu": {
+        "peak_percent": 0.0,
+        "mean_percent": 0.0,
+        "total_cpu_seconds": 0.0
+      },
+      "duration_seconds": 0.00019288063049316406
+    },
+    "success": false,
+    "data_size_bytes": 65787633,
+    "error": "__init__() got an unexpected keyword argument 'batch_timeout_seconds'",
+    "throughput_mbps": 616.8033921188086
+  }
+]
